@@ -1,0 +1,43 @@
+plugins {
+  id 'java'
+  id 'application'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_19
+  targetCompatibility = JavaVersion.VERSION_19
+}
+
+application {
+  mainClass = 'org.example.App'
+}
+
+def javaFXVersion = "19"
+
+dependencies {
+  implementation "org.openjfx:javafx-base:${javaFXVersion}:win"
+  implementation "org.openjfx:javafx-controls:${javaFXVersion}:win"
+  implementation "org.openjfx:javafx-fxml:${javaFXVersion}:win"
+  implementation "org.openjfx:javafx-graphics:${javaFXVersion}:win"
+  implementation "org.openjfx:javafx-swing:${javaFXVersion}:win"
+
+  testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
+}
+
+run {
+  jvmArgs = [
+          '--module-path', classpath.asPath,
+          '--add-modules', 'javafx.controls,javafx.fxml,javafx.swing,javafx.graphics,javafx.base'
+  ]
+}
+
+test {
+  useJUnitPlatform()
+}
