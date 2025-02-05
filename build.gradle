@@ -1,43 +1,66 @@
 plugins {
   id 'java'
   id 'application'
+  id 'org.openjfx.javafxplugin' version '0.1.0'
+  id 'jacoco'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group = 'org.example'
+version = '1.0-SNAPSHOT'
 
 repositories {
   mavenCentral()
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_19
-  targetCompatibility = JavaVersion.VERSION_19
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
+
+javafx {
+  version = '17'
+  modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
 }
 
 application {
   mainClass = 'org.example.App'
 }
 
-def javaFXVersion = "19"
-
 dependencies {
-  implementation "org.openjfx:javafx-base:${javaFXVersion}:win"
-  implementation "org.openjfx:javafx-controls:${javaFXVersion}:win"
-  implementation "org.openjfx:javafx-fxml:${javaFXVersion}:win"
-  implementation "org.openjfx:javafx-graphics:${javaFXVersion}:win"
-  implementation "org.openjfx:javafx-swing:${javaFXVersion}:win"
+  implementation 'org.openjfx:javafx-controls:17'
+  implementation 'org.openjfx:javafx-fxml:17'
+  implementation 'org.openjfx:javafx-graphics:17'
 
-  testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
+  testImplementation platform('org.junit:junit-bom:5.9.2')
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testImplementation 'org.mockito:mockito-core:5.3.1'
+  testImplementation 'org.mockito:mockito-junit-jupiter:5.3.1'
+
+  testImplementation 'org.testfx:testfx-core:4.0.17'
+  testImplementation 'org.testfx:testfx-junit5:4.0.17'
+  testRuntimeOnly 'org.testfx:openjfx-monocle:17.0.10'
 }
 
 run {
-  jvmArgs = [
-          '--module-path', classpath.asPath,
-          '--add-modules', 'javafx.controls,javafx.fxml,javafx.swing,javafx.graphics,javafx.base'
-  ]
+  jvmArgs = ['--module-path', classpath.asPath,
+             '--add-modules', 'javafx.controls,javafx.fxml,javafx.graphics']
+}
+
+tasks.withType(JavaExec) {
+  jvmArgs = ['--module-path', classpath.asPath,
+             '--add-modules', 'javafx.controls,javafx.fxml,javafx.graphics']
 }
 
 test {
   useJUnitPlatform()
+  systemProperty 'java.awt.headless', 'true'
+  systemProperty 'testfx.robot', 'glass'
+  systemProperty 'testfx.headless', 'true'
+  systemProperty 'prism.order', 'sw'
+  systemProperty 'glass.platform', 'Monocle'
+  systemProperty 'monocle.platform', 'Headless'
+}
+
+jacocoTestReport {
+  dependsOn test
 }
