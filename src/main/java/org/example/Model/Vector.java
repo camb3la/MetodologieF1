@@ -14,14 +14,11 @@ public class Vector {
 
     public List<Vector> getPossibleNextMoves() {
         List<Vector> moves = new ArrayList<>();
-
-        // Per ogni componente possiamo variare di ±1 rispetto al valore attuale
         for (int newDx = dx - 1; newDx <= dx + 1; newDx++) {
             for (int newDy = dy - 1; newDy <= dy + 1; newDy++) {
                 moves.add(new Vector(newDx, newDy));
             }
         }
-
         return moves;
     }
 
@@ -45,11 +42,6 @@ public class Vector {
         if (o == null || getClass() != o.getClass()) return false;
         Vector vector = (Vector) o;
         return dx == vector.dx && dy == vector.dy;
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * dx + dy;
     }
 
     @Override
