@@ -72,12 +72,11 @@ public class Player {
     }
 
     public void moveTo(Position newPosition) {
-        Vector movement = new Vector(
+
+        this.currentVector = new Vector(
                 newPosition.getX() - currentPosition.getX(),
                 newPosition.getY() - currentPosition.getY()
         );
-
-        this.currentVector = movement;
         this.currentPosition = newPosition;
     }
 
@@ -104,11 +103,14 @@ public class Player {
     }
 
     public boolean canReach(Position target) {
-        Vector movement = new Vector(
+        Vector requiredMovement = new Vector(
                 target.getX() - currentPosition.getX(),
                 target.getY() - currentPosition.getY()
         );
-        return movement.isValidMove(currentVector);
+
+        // Verifica se questo movimento può essere ottenuto con una variazione valida della velocità
+        return Math.abs(requiredMovement.getDx() - currentVector.getDx()) <= 1 &&
+                Math.abs(requiredMovement.getDy() - currentVector.getDy()) <= 1;
     }
 
     public void setFinished() {
@@ -142,5 +144,13 @@ public class Player {
 
     public boolean isHuman() {
         return !isBot;
+    }
+
+    public boolean isFirstMove() {
+        return firstMove;
+    }
+
+    public void setFirstMove(){
+        firstMove = false;
     }
 }

@@ -1,5 +1,6 @@
 package org.example.Controller;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import org.example.Model.Grid;
@@ -10,7 +11,6 @@ import org.example.View.GridView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class GameController {
     private final Grid track;
@@ -72,41 +72,40 @@ public class GameController {
         gridView.clearHighlights();
 
         // Se è un bot, processa il suo turno
-        if (currentPlayer.isBot()) {
-            processBotTurn();
-        } else {
-            // Se è un giocatore umano, mostra le mosse possibili
-            List<Position> possibleMoves = currentPlayer.getPossibleMoves(track);
-            gridView.highlightPossibleMoves(possibleMoves);
-        }
+        if (currentPlayer.isBot()) processBotTurn();
+        // Se è un giocatore umano, mostra le mosse possibili
+        else gridView.highlightPossibleMoves(currentPlayer.getPossibleMoves(track));
     }
 
     private void handleCellSelection(Position position) {
         if (gameFinished || isProcessingTurn) return;
 
-        Player currentPlayer = getCurrentPlayer();
-        if (!currentPlayer.isHuman()) return;
+        if (!getCurrentPlayer().isHuman()) return;
 
-        if (isValidMove(currentPlayer, position)) {
+        if (isValidMove(getCurrentPlayer(), position)) {
             isProcessingTurn = true;
-            processPlayerMove(currentPlayer, position);
+            processPlayerMove(getCurrentPlayer(), position);
         }
     }
 
     private void processPlayerMove(Player player, Position targetPosition) {
+        Position oldPosition = player.getCurrentPosition();
+
         // Esegui il movimento
         player.moveTo(targetPosition);
 
         // Aggiorna la visualizzazione
         gridView.updatePlayerMarker(player, targetPosition);
 
-        // Verifica vittoria
-        if (track.isFinishLine(targetPosition)) {
-            handlePlayerWin(player);
-            return;
+        // Verifica vittoria solo se non è la prima mossa
+        if (!player.isFirstMove()){
+            if(track.crossFinishLine(oldPosition, targetPosition)) {
+                handlePlayerWin(player);
+                return;
+            }
         }
-
         completeCurrentTurn();
+        player.setFirstMove();
     }
 
     private void processBotTurn() {
@@ -114,11 +113,13 @@ public class GameController {
         isProcessingTurn = true;
 
         Player bot = getCurrentPlayer();
+        Position oldPosition = bot.getCurrentPosition();
+
         bot.makeMove(track);
         gridView.updatePlayerMarker(bot, bot.getCurrentPosition());
 
-        // Verifica vittoria
-        if (track.isFinishLine(bot.getCurrentPosition())) {
+        // Verifica vittoria solo se non è la prima mossa
+        if (!bot.isFirstMove() && track.crossFinishLine(oldPosition, bot.getCurrentPosition())) {
             handlePlayerWin(bot);
             return;
         }
@@ -138,23 +139,29 @@ public class GameController {
         player.setFinished();
         gridView.clearHighlights();
 
+        // In un contesto di test, Platform.runLater non sarà disponibile
+        if (Platform.isFxApplicationThread()) showWinWindow(player);
+        // Nel contesto di test, notifica direttamente il listener se presente
+        else if (gameEndListener != null) gameEndListener.newGame();
+    }
+
+    private void showWinWindow(Player player) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Race Finished!");
-        alert.setHeaderText(player.getName() + " has won the race!");
-        alert.setContentText("Would you like to start a new game?");
+        alert.setTitle("Gara Finita!");
+        alert.setHeaderText(player.getName() + " ha vinto la gara!");
+        alert.setContentText("Vuoi giocare una nuova partita?");
 
         ButtonType newGameButton = new ButtonType("New Game");
         ButtonType quitButton = new ButtonType("Quit");
         alert.getButtonTypes().setAll(newGameButton, quitButton);
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent()) {
-            if (result.get() == newGameButton && gameEndListener != null) {
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == newGameButton && gameEndListener != null) {
                 gameEndListener.newGame();
             } else if (gameEndListener != null) {
                 gameEndListener.quitGame();
             }
-        }
+        });
     }
 
     private void completeCurrentTurn() {
@@ -173,7 +180,4 @@ public class GameController {
         return players.get(currentPlayerIndex);
     }
 
-    public List<Player> getPlayers() {
-        return new ArrayList<>(players);
-    }
 }
