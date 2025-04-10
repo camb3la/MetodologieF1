@@ -3,11 +3,17 @@ package org.example.Controller;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import org.example.Controller.Game.VictoryDetector;
+import org.example.Controller.Move.BotPlayHandler;
+import org.example.Controller.Move.MoveValidator;
+import org.example.Controller.Move.PlayerInputHandler;
+import org.example.Controller.Turn.TurnManager;
 import org.example.Model.Grid;
+import org.example.Model.Interface.OnGameEndListener;
 import org.example.Model.Player;
 import org.example.Model.Position;
-import org.example.Model.Interface.OnGameEndListener;
 import org.example.View.GridView;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +21,16 @@ import java.util.List;
 public class GameController {
     private final Grid track;
     private final List<Player> players;
-    private int currentPlayerIndex;
     private final GridView gridView;
+
+    // Componenti specializzati
+    private final TurnManager turnManager;
+    private final MoveValidator moveValidator;
+    private final VictoryDetector victoryDetector;
+    private final PlayerInputHandler inputHandler;
+    private final BotPlayHandler botHandler;
+
+    // Stato del gioco
     private boolean isProcessingTurn;
     private boolean gameFinished;
     private OnGameEndListener gameEndListener;
@@ -24,10 +38,16 @@ public class GameController {
     public GameController(Grid track, List<Player> players, GridView gridView) {
         this.track = track;
         this.players = new ArrayList<>(players);
-        this.currentPlayerIndex = 0;
         this.gridView = gridView;
         this.isProcessingTurn = false;
         this.gameFinished = false;
+
+        // Inizializza i componenti specializzati
+        this.turnManager = new TurnManager(players);
+        this.moveValidator = new MoveValidator(track);
+        this.victoryDetector = new VictoryDetector(track);
+        this.inputHandler = new PlayerInputHandler(gridView);
+        this.botHandler = new BotPlayHandler();
 
         initializeGame();
     }
@@ -45,46 +65,42 @@ public class GameController {
         }
 
         // Setup del listener per i click sulla griglia
-        gridView.setOnCellSelectListener(this::handleCellSelection);
+        inputHandler.setOnCellSelectListener(this::handleCellSelection);
 
         // Imposta e mostra il primo giocatore
-        Player firstPlayer = getCurrentPlayer();
+        Player firstPlayer = turnManager.getCurrentPlayer();
         gridView.setCurrentPlayer(firstPlayer);
 
-        if (firstPlayer.isHuman()) {
-            System.out.println("Primo giocatore è umano, calcolo mosse possibili");
-            List<Position> possibleMoves = firstPlayer.getPossibleMoves(track);
-
-            // Aggiungiamo qui i log dettagliati
-            System.out.println("Calcolate posizioni per highlight:");
-            possibleMoves.forEach(pos ->
-                    System.out.println("Posizione calcolata: X=" + pos.getX() + ", Y=" + pos.getY()));
-
-            System.out.println("Trovate " + possibleMoves.size() + " mosse possibili");
-            gridView.highlightPossibleMoves(possibleMoves);
-        }
+        // Avvia il primo turno
+        startTurn();
     }
 
     private void startTurn() {
         if (gameFinished) return;
 
-        Player currentPlayer = getCurrentPlayer();
-        gridView.clearHighlights();
+        Player currentPlayer = turnManager.getCurrentPlayer();
+        inputHandler.clearHighlights();
 
         // Se è un bot, processa il suo turno
-        if (currentPlayer.isBot()) processBotTurn();
+        if (currentPlayer.isBot()) {
+            processBotTurn();
+        }
         // Se è un giocatore umano, mostra le mosse possibili
-        else gridView.highlightPossibleMoves(currentPlayer.getPossibleMoves(track));
+        else {
+            List<Position> possibleMoves = currentPlayer.getPossibleMoves(track);
+            inputHandler.showPossibleMoves(possibleMoves);
+        }
     }
 
     private void handleCellSelection(Position position) {
         if (gameFinished || isProcessingTurn) return;
 
-        if (!getCurrentPlayer().isHuman()) return;
+        Player currentPlayer = turnManager.getCurrentPlayer();
+        if (!currentPlayer.isHuman()) return;
 
-        if (isValidMove(getCurrentPlayer(), position)) {
+        if (moveValidator.isValidMove(currentPlayer, position)) {
             isProcessingTurn = true;
-            processPlayerMove(getCurrentPlayer(), position);
+            processPlayerMove(currentPlayer, position);
         }
     }
 
@@ -99,11 +115,12 @@ public class GameController {
 
         // Verifica vittoria solo se non è la prima mossa
         if (!player.isFirstMove()){
-            if(track.crossFinishLine(oldPosition, targetPosition)) {
+            if(victoryDetector.checkVictory(oldPosition, targetPosition)) {
                 handlePlayerWin(player);
                 return;
             }
         }
+
         completeCurrentTurn();
         player.setFirstMove();
     }
@@ -112,29 +129,34 @@ public class GameController {
         if (isProcessingTurn) return;
         isProcessingTurn = true;
 
-        Player bot = getCurrentPlayer();
+        Player bot = turnManager.getCurrentPlayer();
         Position oldPosition = bot.getCurrentPosition();
 
-        bot.makeMove(track);
-        gridView.updatePlayerMarker(bot, bot.getCurrentPosition());
+        // Delega al BotPlayHandler la gestione del turno del bot
+        botHandler.makeBotMove(bot, track, newPosition -> {
+            // Questa parte viene eseguita quando il bot ha completato la mossa
+            Platform.runLater(() -> {
+                gridView.updatePlayerMarker(bot, newPosition);
 
-        // Verifica vittoria solo se non è la prima mossa
-        if (!bot.isFirstMove() && track.crossFinishLine(oldPosition, bot.getCurrentPosition())) {
-            handlePlayerWin(bot);
-            return;
-        }
+                // Verifica vittoria solo se non è la prima mossa
+                if (!bot.isFirstMove() && victoryDetector.checkVictory(oldPosition, newPosition)) {
+                    handlePlayerWin(bot);
+                    return;
+                }
 
-        completeCurrentTurn();
+                completeCurrentTurn();
+            });
+        });
     }
 
     private void handlePlayerWin(Player player) {
         gameFinished = true;
         player.setFinished();
-        gridView.clearHighlights();
+        inputHandler.clearHighlights();
 
         // In un contesto di test, Platform.runLater non sarà disponibile
         if (Platform.isFxApplicationThread()) showWinWindow(player);
-        // Nel contesto di test, notifica direttamente il listener se presente
+            // Nel contesto di test, notifica direttamente il listener se presente
         else if (gameEndListener != null) gameEndListener.newGame();
     }
 
@@ -158,19 +180,10 @@ public class GameController {
     }
 
     private void completeCurrentTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        turnManager.nextTurn();
         isProcessingTurn = false;
-        gridView.setCurrentPlayer(getCurrentPlayer());
+        gridView.setCurrentPlayer(turnManager.getCurrentPlayer());
         startTurn();
-    }
-
-    private boolean isValidMove(Player player, Position targetPosition) {
-        return player.canReach(targetPosition) &&
-                track.isWalkable(targetPosition.getX(), targetPosition.getY());
-    }
-
-    public Player getCurrentPlayer() {
-        return players.get(currentPlayerIndex);
     }
 
 }
