@@ -24,16 +24,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GridView extends Pane {
+
     private static final int WINDOW_WIDTH = 1920;
+
     private static final int WINDOW_HEIGHT = 1080;
 
     private final Grid grid;
-    private final Rectangle[][] cellOverlays;
-    private final List<Position> highlightedCells;
-    private final Map<Player, Rectangle> playerMarkers;
-    private OnCellSelectListener onCellSelectListener;
-    private Player currentPlayer;
 
+    private final Rectangle[][] cellOverlays;
+
+    private final List<Position> highlightedCells;
+
+    private final Map<Player, Rectangle> playerMarkers;
+
+    private OnCellSelectListener onCellSelectListener;
+
+    private Player currentPlayer;
 
     public GridView(Grid grid, BufferedImage backgroundImg) {
         this.grid = grid;
@@ -197,7 +203,7 @@ public class GridView extends Pane {
         }
     }
 
-    public void setOnCellSelectListener(OnCellSelectListener listener) {
+    public void setOnCellSelectListener(OnCellSelectListener listener){
         this.onCellSelectListener = listener;
     }
 
