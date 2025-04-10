@@ -41,16 +41,6 @@ dependencies {
   testRuntimeOnly 'org.testfx:openjfx-monocle:17.0.10'
 }
 
-run {
-  jvmArgs = ['--module-path', classpath.asPath,
-             '--add-modules', 'javafx.controls,javafx.fxml,javafx.graphics']
-}
-
-tasks.withType(JavaExec) {
-  jvmArgs = ['--module-path', classpath.asPath,
-             '--add-modules', 'javafx.controls,javafx.fxml,javafx.graphics']
-}
-
 test {
   useJUnitPlatform()
   systemProperty 'java.awt.headless', 'true'
