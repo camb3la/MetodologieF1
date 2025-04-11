@@ -1,6 +1,6 @@
 package org.example.Model.Interface;
 
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Position;
 import org.example.Model.Vector;
 
@@ -8,19 +8,19 @@ public abstract class AbstractBotStrategy implements MovementStrategy {
     protected static final int SAFETY_CHECK_DISTANCE = 3;
 
     @Override
-    public abstract Vector getNextMove(Position currentPosition, Vector currentVector, Grid grid);
+    public abstract Vector getNextMove(Position currentPosition, Vector currentVector, IGrid grid);
 
     protected double calculateSpeed(Vector vector) {
         return Math.sqrt(vector.getDx() * vector.getDx() + vector.getDy() * vector.getDy());
     }
 
-    protected boolean isValidMove(Position currentPos, Vector move, Grid grid) {
+    protected boolean isValidMove(Position currentPos, Vector move, IGrid grid) {
         int newX = currentPos.getX() + move.getDx();
         int newY = currentPos.getY() + move.getDy();
         return grid.isWalkable(newX, newY);
     }
 
-    protected boolean isSafeMove(Position currentPos, Vector move, Grid grid) {
+    protected boolean isSafeMove(Position currentPos, Vector move, IGrid grid) {
         int x = currentPos.getX();
         int y = currentPos.getY();
         int dx = move.getDx();
@@ -49,7 +49,7 @@ public abstract class AbstractBotStrategy implements MovementStrategy {
         return true;
     }
 
-    protected double calculateSafetyScore(Position currentPos, Vector move, Grid grid) {
+    protected double calculateSafetyScore(Position currentPos, Vector move, IGrid grid) {
         double score = 0;
         int x = currentPos.getX();
         int y = currentPos.getY();

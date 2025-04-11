@@ -1,13 +1,13 @@
 package org.example.Controller.Move;
 
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Player;
 import org.example.Model.Position;
 
 public class MoveValidator {
-    private final Grid grid;
+    private final IGrid grid;
 
-    public MoveValidator(Grid grid) {
+    public MoveValidator(IGrid grid) {
         this.grid = grid;
     }
 

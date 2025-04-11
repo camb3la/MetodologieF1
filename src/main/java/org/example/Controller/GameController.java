@@ -8,7 +8,7 @@ import org.example.Controller.Move.BotPlayHandler;
 import org.example.Controller.Move.MoveValidator;
 import org.example.Controller.Move.PlayerInputHandler;
 import org.example.Controller.Turn.TurnManager;
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Interface.OnGameEndListener;
 import org.example.Model.Player;
 import org.example.Model.Position;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameController {
-    private final Grid track;
+    private final IGrid track;
     private final List<Player> players;
     private final GridView gridView;
 
@@ -35,7 +35,7 @@ public class GameController {
     private boolean gameFinished;
     private OnGameEndListener gameEndListener;
 
-    public GameController(Grid track, List<Player> players, GridView gridView) {
+    public GameController(IGrid track, List<Player> players, GridView gridView) {
         this.track = track;
         this.players = new ArrayList<>(players);
         this.gridView = gridView;

@@ -1,6 +1,6 @@
 package org.example.Model.Strategy;
 
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Interface.MovementStrategy;
 import org.example.Model.Position;
 import org.example.Model.Vector;
@@ -13,7 +13,7 @@ public class HumanStrategy implements MovementStrategy {
     }
 
     @Override
-    public Vector getNextMove(Position currentPosition, Vector currentVector, Grid grid){
+    public Vector getNextMove(Position currentPosition, Vector currentVector, IGrid grid){
         Vector result = move;
         move = null;
         return result;

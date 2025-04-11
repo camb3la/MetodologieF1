@@ -10,7 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.input.MouseEvent;
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Player;
 import org.example.Model.Position;
 
@@ -29,7 +29,7 @@ public class GridView extends Pane {
 
     private static final int WINDOW_HEIGHT = 1080;
 
-    private final Grid grid;
+    private final IGrid grid;
 
     private final Rectangle[][] cellOverlays;
 
@@ -41,7 +41,7 @@ public class GridView extends Pane {
 
     private Player currentPlayer;
 
-    public GridView(Grid grid, BufferedImage backgroundImg) {
+    public GridView(IGrid grid, BufferedImage backgroundImg) {
         this.grid = grid;
         this.highlightedCells = new ArrayList<>();
         this.playerMarkers = new ConcurrentHashMap<>();

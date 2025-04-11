@@ -8,9 +8,10 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.Controller.GameController;
-import org.example.Model.Grid;
 import org.example.Model.Player;
 import org.example.Model.Position;
+import org.example.Model.Grid.GridFactory;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Interface.OnGameEndListener;
 import org.example.Utils.ErrorHandler;
 
@@ -24,11 +25,16 @@ public class GameSetupView {
     private TextField selectedImagePath;
     private Spinner<Integer> botSpinner;
     private TextField playerNameField;
-    private VBox playersPanel;
-    private ArrayList<String> playerNames;
+    private final VBox playersPanel;
+    private final ArrayList<String> playerNames;
     private File selectedFile;
-    private Stage stage;
+    private final Stage stage;
     private Stage gameStage;
+
+    // Dimensioni richieste per l'immagine
+    private static final int REQUIRED_WIDTH = 1920;
+    private static final int REQUIRED_HEIGHT = 1080;
+    private static final int CELL_SIZE = 20;
 
     public GameSetupView(Stage stage) {
         this.stage = stage;
@@ -195,13 +201,14 @@ public class GameSetupView {
                 throw new IllegalStateException("Failed to load image");
             }
 
-            if (image.getWidth() != 1920 || image.getHeight() != 1080) {
-                showError("Image must be 1920x1080 pixels");
+            if (image.getWidth() != REQUIRED_WIDTH || image.getHeight() != REQUIRED_HEIGHT) {
+                showError("Image must be " + REQUIRED_WIDTH + "x" + REQUIRED_HEIGHT + " pixels");
                 return;
             }
 
             System.out.println("Creating grid...");
-            Grid grid = new Grid(image);
+            // Utilizziamo la factory per creare la griglia invece del costruttore diretto
+            IGrid grid = GridFactory.createGrid(image, CELL_SIZE, REQUIRED_WIDTH, REQUIRED_HEIGHT);
             System.out.println("Grid created successfully");
 
             System.out.println("Creating GridView...");
@@ -248,7 +255,7 @@ public class GameSetupView {
         }
     }
 
-    private List<Player> createPlayers(Grid grid) {
+    private List<Player> createPlayers(IGrid grid) {
         int totalPlayers = playerNames.size() + botSpinner.getValue();
         List<Position> startPositions = grid.getStartingPositions(totalPlayers);
         List<Player> players = new ArrayList<>();

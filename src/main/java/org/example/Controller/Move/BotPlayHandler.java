@@ -1,6 +1,6 @@
 package org.example.Controller.Move;
 
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Player;
 import org.example.Model.Position;
 
@@ -25,7 +25,7 @@ public class BotPlayHandler {
      * @param grid La griglia di gioco
      * @param onMoveComplete Callback da invocare quando la mossa è completata
      */
-    public void makeBotMove(Player bot, Grid grid, Consumer<Position> onMoveComplete) {
+    public void makeBotMove(Player bot, IGrid grid, Consumer<Position> onMoveComplete) {
         // Esegue il calcolo della mossa in background
         executor.submit(() -> {
             Position oldPosition = bot.getCurrentPosition();

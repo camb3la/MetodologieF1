@@ -1,6 +1,6 @@
 package org.example.Model.Strategy;
 
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Interface.AbstractBotStrategy;
 import org.example.Model.Position;
 import org.example.Model.Vector;
@@ -10,7 +10,7 @@ public class AggressiveBotStrategy extends AbstractBotStrategy {
     private static final double MAX_SAFE_SPEED = 4.0;
 
     @Override
-    public Vector getNextMove(Position currentPosition, Vector currentVector, Grid grid) {
+    public Vector getNextMove(Position currentPosition, Vector currentVector, IGrid grid) {
         List<Vector> possibleMoves = currentVector.getPossibleNextMoves();
 
         return possibleMoves.stream()

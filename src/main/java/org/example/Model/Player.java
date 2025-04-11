@@ -1,6 +1,7 @@
 package org.example.Model;
 
 import javafx.scene.paint.Color;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Interface.MovementStrategy;
 import org.example.Model.Strategy.AggressiveBotStrategy;
 import org.example.Model.Strategy.ConservativeBotStrategy;
@@ -35,7 +36,7 @@ public class Player {
                 new HumanStrategy();
     }
 
-    public List<Position> getPossibleMoves(Grid grid) {
+    public List<Position> getPossibleMoves(IGrid grid) {
         List<Position> validMoves = new ArrayList<>();
         List<Vector> possibleVectors = currentVector.getPossibleNextMoves();
 
@@ -63,7 +64,7 @@ public class Player {
         return validMoves;
     }
 
-    public void makeMove(Grid grid) {
+    public void makeMove(IGrid grid) {
         Vector nextMove = strategy.getNextMove(currentPosition, currentVector, grid);
         if (nextMove != null && isValidMove(nextMove, grid)) {
             currentVector = nextMove;
@@ -87,7 +88,7 @@ public class Player {
         );
     }
 
-    public boolean isValidMove(Vector newVector, Grid grid) {
+    public boolean isValidMove(Vector newVector, IGrid grid) {
         if (!newVector.isValidMove(currentVector)) {
             return false;
         }

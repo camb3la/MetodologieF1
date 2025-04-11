@@ -1,12 +1,12 @@
 package org.example.Controller.Game;
 
-import org.example.Model.Grid;
+import org.example.Model.Grid.IGrid;
 import org.example.Model.Position;
 
 public class VictoryDetector {
-    private final Grid grid;
+    private final IGrid grid;
 
-    public VictoryDetector(Grid grid) {
+    public VictoryDetector(IGrid grid) {
         this.grid = grid;
     }
 
