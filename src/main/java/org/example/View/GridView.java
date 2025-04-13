@@ -11,7 +11,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.input.MouseEvent;
 import org.example.Model.Grid.IGrid;
-import org.example.Model.Player;
+import org.example.Model.Player.IPlayer;
 import org.example.Model.Position;
 
 import java.awt.image.BufferedImage;
@@ -35,11 +35,11 @@ public class GridView extends Pane {
 
     private final List<Position> highlightedCells;
 
-    private final Map<Player, Rectangle> playerMarkers;
+    private final Map<IPlayer, Rectangle> playerMarkers;
 
     private OnCellSelectListener onCellSelectListener;
 
-    private Player currentPlayer;
+    private IPlayer currentPlayer;
 
     public GridView(IGrid grid, BufferedImage backgroundImg) {
         this.grid = grid;
@@ -160,7 +160,7 @@ public class GridView extends Pane {
         highlightedCells.clear();
     }
 
-    public void updatePlayerMarker(Player player, Position position) {
+    public void updatePlayerMarker(IPlayer player, Position position) {
         Rectangle existingMarker = playerMarkers.get(player);
         if (existingMarker != null) {
             getChildren().remove(existingMarker);
@@ -185,7 +185,7 @@ public class GridView extends Pane {
         playerMarkers.put(player, marker);
     }
 
-    public void setCurrentPlayer(Player player) {
+    public void setCurrentPlayer(IPlayer player) {
         if (currentPlayer != null) {
             Rectangle marker = playerMarkers.get(currentPlayer);
             if (marker != null) {

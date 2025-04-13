@@ -10,7 +10,7 @@ import org.example.Controller.Move.PlayerInputHandler;
 import org.example.Controller.Turn.TurnManager;
 import org.example.Model.Grid.IGrid;
 import org.example.Model.Interface.OnGameEndListener;
-import org.example.Model.Player;
+import org.example.Model.Player.IPlayer;
 import org.example.Model.Position;
 import org.example.View.GridView;
 
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class GameController {
     private final IGrid track;
-    private final List<Player> players;
+    private final List<IPlayer> players;
     private final GridView gridView;
 
     // Componenti specializzati
@@ -35,7 +35,7 @@ public class GameController {
     private boolean gameFinished;
     private OnGameEndListener gameEndListener;
 
-    public GameController(IGrid track, List<Player> players, GridView gridView) {
+    public GameController(IGrid track, List<IPlayer> players, GridView gridView) {
         this.track = track;
         this.players = new ArrayList<>(players);
         this.gridView = gridView;
@@ -60,7 +60,7 @@ public class GameController {
         System.out.println("Inizializzazione gioco...");
 
         // Posiziona i marker iniziali per tutti i giocatori
-        for (Player player : players) {
+        for (IPlayer player : players) {
             gridView.updatePlayerMarker(player, player.getCurrentPosition());
         }
 
@@ -68,7 +68,7 @@ public class GameController {
         inputHandler.setOnCellSelectListener(this::handleCellSelection);
 
         // Imposta e mostra il primo giocatore
-        Player firstPlayer = turnManager.getCurrentPlayer();
+        IPlayer firstPlayer = turnManager.getCurrentPlayer();
         gridView.setCurrentPlayer(firstPlayer);
 
         // Avvia il primo turno
@@ -78,7 +78,7 @@ public class GameController {
     private void startTurn() {
         if (gameFinished) return;
 
-        Player currentPlayer = turnManager.getCurrentPlayer();
+        IPlayer currentPlayer = turnManager.getCurrentPlayer();
         inputHandler.clearHighlights();
 
         // Se è un bot, processa il suo turno
@@ -95,7 +95,7 @@ public class GameController {
     private void handleCellSelection(Position position) {
         if (gameFinished || isProcessingTurn) return;
 
-        Player currentPlayer = turnManager.getCurrentPlayer();
+        IPlayer currentPlayer = turnManager.getCurrentPlayer();
         if (!currentPlayer.isHuman()) return;
 
         if (moveValidator.isValidMove(currentPlayer, position)) {
@@ -104,7 +104,7 @@ public class GameController {
         }
     }
 
-    private void processPlayerMove(Player player, Position targetPosition) {
+    private void processPlayerMove(IPlayer player, Position targetPosition) {
         Position oldPosition = player.getCurrentPosition();
 
         // Esegui il movimento
@@ -129,7 +129,7 @@ public class GameController {
         if (isProcessingTurn) return;
         isProcessingTurn = true;
 
-        Player bot = turnManager.getCurrentPlayer();
+        IPlayer bot = turnManager.getCurrentPlayer();
         Position oldPosition = bot.getCurrentPosition();
 
         // Delega al BotPlayHandler la gestione del turno del bot
@@ -149,7 +149,7 @@ public class GameController {
         });
     }
 
-    private void handlePlayerWin(Player player) {
+    private void handlePlayerWin(IPlayer player) {
         gameFinished = true;
         player.setFinished();
         inputHandler.clearHighlights();
@@ -160,7 +160,7 @@ public class GameController {
         else if (gameEndListener != null) gameEndListener.newGame();
     }
 
-    private void showWinWindow(Player player) {
+    private void showWinWindow(IPlayer player) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Gara Finita!");
         alert.setHeaderText(player.getName() + " ha vinto la gara!");

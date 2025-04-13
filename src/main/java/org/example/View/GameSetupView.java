@@ -8,7 +8,8 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.Controller.GameController;
-import org.example.Model.Player;
+import org.example.Model.Player.IPlayer;
+import org.example.Model.Player.PlayerFactory;
 import org.example.Model.Position;
 import org.example.Model.Grid.GridFactory;
 import org.example.Model.Grid.IGrid;
@@ -218,7 +219,7 @@ public class GameSetupView {
             System.out.println("GridView created successfully");
 
             System.out.println("Creating players...");
-            List<Player> players = createPlayers(grid);
+            List<IPlayer> players = createPlayers(grid);
             System.out.println("Created " + players.size() + " players successfully");
 
             System.out.println("Initializing game controller...");
@@ -255,23 +256,8 @@ public class GameSetupView {
         }
     }
 
-    private List<Player> createPlayers(IGrid grid) {
-        int totalPlayers = playerNames.size() + botSpinner.getValue();
-        List<Position> startPositions = grid.getStartingPositions(totalPlayers);
-        List<Player> players = new ArrayList<>();
-
-        // Crea i giocatori umani
-        for (int i = 0; i < playerNames.size(); i++) {
-            players.add(new Player(playerNames.get(i), startPositions.get(i), false));
-        }
-
-        // Crea i bot
-        for (int i = 0; i < botSpinner.getValue(); i++) {
-            String botName = "Bot " + (i + 1);
-            players.add(new Player(botName, startPositions.get(playerNames.size() + i), true));
-        }
-
-        return players;
+    private List<IPlayer> createPlayers(IGrid grid) {
+        return PlayerFactory.createPlayers(grid, playerNames, botSpinner.getValue());
     }
 
     public void show() {

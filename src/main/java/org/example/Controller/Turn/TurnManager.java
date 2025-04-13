@@ -1,19 +1,20 @@
 package org.example.Controller.Turn;
 
-import org.example.Model.Player;
+import org.example.Model.Player.IPlayer;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class TurnManager {
-    private final List<Player> players;
+    private final List<IPlayer> players;
     private int currentPlayerIndex;
 
-    public TurnManager(List<Player> players) {
+    public TurnManager(List<IPlayer> players) {
         this.players = new ArrayList<>(players);
         this.currentPlayerIndex = 0;
     }
 
-    public Player getCurrentPlayer() {
+    public IPlayer getCurrentPlayer() {
         return players.get(currentPlayerIndex);
     }
 
