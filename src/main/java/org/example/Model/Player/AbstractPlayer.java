@@ -1,41 +1,44 @@
-package org.example.Model;
+package org.example.Model.Player;
 
 import javafx.scene.paint.Color;
 import org.example.Model.Grid.IGrid;
 import org.example.Model.Interface.MovementStrategy;
-import org.example.Model.Strategy.AggressiveBotStrategy;
-import org.example.Model.Strategy.ConservativeBotStrategy;
-import org.example.Model.Strategy.HumanStrategy;
+import org.example.Model.Position;
+import org.example.Model.Vector;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
-    private final String name;
-    private Position currentPosition;
-    private Vector currentVector;
-    private final MovementStrategy strategy;
-    private final boolean isBot;
-    private final Color color;
-    private boolean hasFinished;
-    private boolean firstMove;
+/**
+ * Classe astratta che implementa la logica comune a tutti i tipi di giocatori
+ */
+public abstract class AbstractPlayer implements IPlayer {
 
-    public Player(String name, Position startPosition, boolean isBot) {
+    protected final String name;
+
+    protected Position currentPosition;
+
+    protected Vector currentVector;
+
+    protected final MovementStrategy strategy;
+
+    protected final Color color;
+
+    protected boolean hasFinished;
+
+    protected boolean firstMove;
+
+    protected AbstractPlayer(String name, Position startPosition, MovementStrategy strategy, Color color) {
         this.name = name;
         this.currentPosition = startPosition;
         this.currentVector = new Vector(0, 0);  // All'inizio il veicolo è fermo
-        this.isBot = isBot;
+        this.strategy = strategy;
         this.hasFinished = false;
         this.firstMove = true;
-        this.color = Color.rgb(
-                (int)(Math.random() * 255),
-                (int)(Math.random() * 255),
-                (int)(Math.random() * 255)
-        );
-        this.strategy = isBot ?
-                (Math.random() < 0.5 ? new ConservativeBotStrategy() : new AggressiveBotStrategy()) :
-                new HumanStrategy();
+        this.color = color;
     }
 
+    @Override
     public List<Position> getPossibleMoves(IGrid grid) {
         List<Position> validMoves = new ArrayList<>();
         List<Vector> possibleVectors = currentVector.getPossibleNextMoves();
@@ -49,13 +52,13 @@ public class Player {
             Position newPos = new Position(newX, newY);
 
             if (grid.isValidPosition(newX, newY) && grid.isWalkable(newX, newY)) {
-                if(firstMove){                          //Il primo movimento deve essere verso sinistra
-                    if (newY < currentPosition.getY()){
+                if(firstMove) {
+                    // Il primo movimento deve essere verso sinistra
+                    if (newY < currentPosition.getY()) {
                         validMoves.add(newPos);
                         System.out.println("Aggiunta mossa valida: " + newX + "," + newY);
                     }
-                }
-                else {
+                } else {
                     validMoves.add(newPos);
                     System.out.println("Aggiunta mossa valida: " + newX + "," + newY);
                 }
@@ -64,6 +67,7 @@ public class Player {
         return validMoves;
     }
 
+    @Override
     public void makeMove(IGrid grid) {
         Vector nextMove = strategy.getNextMove(currentPosition, currentVector, grid);
         if (nextMove != null && isValidMove(nextMove, grid)) {
@@ -72,8 +76,8 @@ public class Player {
         }
     }
 
+    @Override
     public void moveTo(Position newPosition) {
-
         this.currentVector = new Vector(
                 newPosition.getX() - currentPosition.getX(),
                 newPosition.getY() - currentPosition.getY()
@@ -81,14 +85,14 @@ public class Player {
         this.currentPosition = newPosition;
     }
 
-    private void updatePosition() {
+    protected void updatePosition() {
         currentPosition = new Position(
                 currentPosition.getX() + currentVector.getDx(),
                 currentPosition.getY() + currentVector.getDy()
         );
     }
 
-    public boolean isValidMove(Vector newVector, IGrid grid) {
+    protected boolean isValidMove(Vector newVector, IGrid grid) {
         if (!newVector.isValidMove(currentVector)) {
             return false;
         }
@@ -99,10 +103,7 @@ public class Player {
         return grid.isWalkable(newX, newY);
     }
 
-    public void stop() {
-        this.currentVector = new Vector(0, 0);
-    }
-
+    @Override
     public boolean canReach(Position target) {
         Vector requiredMovement = new Vector(
                 target.getX() - currentPosition.getX(),
@@ -114,44 +115,44 @@ public class Player {
                 Math.abs(requiredMovement.getDy() - currentVector.getDy()) <= 1;
     }
 
+    @Override
     public void setFinished() {
         this.hasFinished = true;
     }
 
-    // Getters
+    // Implementazione dei getters
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public Position getCurrentPosition() {
         return currentPosition;
     }
 
+    @Override
     public Vector getCurrentVector() {
         return currentVector;
     }
 
-    public boolean isBot() {
-        return isBot;
-    }
-
+    @Override
     public Color getColor() {
         return color;
     }
 
+    @Override
     public boolean hasFinished() {
         return hasFinished;
     }
 
-    public boolean isHuman() {
-        return !isBot;
-    }
-
+    @Override
     public boolean isFirstMove() {
         return firstMove;
     }
 
-    public void setFirstMove(){
+    @Override
+    public void setFirstMove() {
         firstMove = false;
     }
 }
