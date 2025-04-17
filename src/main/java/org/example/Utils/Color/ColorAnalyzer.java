@@ -31,19 +31,4 @@ public class ColorAnalyzer implements IColorAnalyzer {
         return isWhiteColor(color);
     }
 
-    /**
-     * Calcola la distanza tra due colori nello spazio RGB.
-     * Può essere utile per il matching di colori con una certa tolleranza.
-     *
-     * @param c1 Il primo colore
-     * @param c2 Il secondo colore
-     * @return La distanza euclidea tra i due colori nello spazio RGB
-     */
-    public double colorDistance(Color c1, Color c2) {
-        int rDiff = c1.getRed() - c2.getRed();
-        int gDiff = c1.getGreen() - c2.getGreen();
-        int bDiff = c1.getBlue() - c2.getBlue();
-
-        return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
-    }
 }
