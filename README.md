@@ -1,4 +1,4 @@
-# 🏎️ Metodologie di Sviluppo Software - Simulatore di Gara F1
+# 🏎️ Metodologie di Programmazione - F1
 
 Questo progetto è stato sviluppato per l'esame di **Metodologie di Programmazione** del corso di Informatica dell'università di Camerino. L'obiettivo di questo progetto era realizzare un videogioco che simulasse la F1 su carta. 
 
