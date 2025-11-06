@@ -20,7 +20,7 @@ Il gioco supporta più giocatori umani, che si muoverano tramite il mouse su una
 Questa sezione descrive la *stack* tecnologica e gli strumenti scelti per la realizzazione del progetto.
 
 | Categoria | Tecnologia |
-| :--- | :--- | :--- |
+| :--- | :--- |
 | **Linguaggio** | **Java** (JDK 17+) |
 | **Build Tool** | **Apache Maven** |
 | **Testing** | **JUnit 5 (Jupiter)** |
