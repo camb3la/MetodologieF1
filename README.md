@@ -33,8 +33,7 @@ Segui questi passi per scaricare, compilare ed eseguire il progetto localmente.
 
 Assicurati di avere installati:
 
-* **Java Development Kit (JDK 17 o superiore)**
-* **Apache Maven**
+* **Java Development Kit (JDK 19))**
 
 ### Installazione e Compilazione
 
@@ -43,9 +42,10 @@ Assicurati di avere installati:
     git clone [https://github.com/camb3la/MetodologieF1.git](https://github.com/camb3la/MetodologieF1.git)
     cd MetodologieF1
     ```
-2.  Compila il progetto e risolvi le dipendenze con Maven:
+2.  Apri il terminale e con Gradle digita i seguenti comandi:
     ```bash
-    mvn clean install
+    .\gradlew build
+    .\gradlew run
     ```
 
-3. Selezionare l'immagine per il circuito e selezionare il numero dei giocatori.
+3. Selezionare l'immagine per il circuito all'interno della cartella "resources" e selezionare il numero dei bot e scrivere il nome dei giocatori reali.
