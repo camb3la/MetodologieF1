@@ -22,7 +22,7 @@ Questa sezione descrive la *stack* tecnologica e gli strumenti scelti per la rea
 | Categoria | Tecnologia |
 | :--- | :--- |
 | **Linguaggio** | **Java** (JDK 17+) |
-| **Build Tool** | **Apache Maven** |
+| **Build Tool** | **Gradle** |
 | **Testing** | **JUnit 5 (Jupiter)** |
 
 ## 🚀 Guida all'Avvio (Getting Started)
