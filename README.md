@@ -21,7 +21,7 @@ Questa sezione descrive la *stack* tecnologica e gli strumenti scelti per la rea
 
 | Categoria | Tecnologia |
 | :--- | :--- |
-| **Linguaggio** | **Java** (JDK 17+) |
+| **Linguaggio** | **Java** (JDK 19) |
 | **Build Tool** | **Gradle** |
 | **Testing** | **JUnit 5 (Jupiter)** |
 
